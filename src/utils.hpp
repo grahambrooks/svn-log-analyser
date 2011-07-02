@@ -1,3 +1,6 @@
+#ifndef UTILS
+#define UTILS
+
 namespace sort {
   template <typename P> struct descending {
 
@@ -6,3 +9,4 @@ namespace sort {
     }
   };
 };
+#endif

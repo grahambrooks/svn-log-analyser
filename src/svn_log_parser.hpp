@@ -1,3 +1,6 @@
+#ifndef SVN_LOG_PARSER
+#define SVN_LOG_PARSER
+
 #include <boost/regex.hpp>
 
 namespace subversion {
@@ -28,3 +31,4 @@ public:
 };
 }
 }
+#endif
