@@ -9,30 +9,32 @@ LIBS		= 	/usr/local/lib/libboost_filesystem.a \
 
 TEST_LIBS	= 	/usr/local/lib/libboost_unit_test_framework.a 
 
-objects 	= 	
+objects 	= 	$(BUILD)/svn_log_parser.o
 
-test_objects	=	
+test_objects	=	$(BUILD)/test_utils.o \
+			$(BUILD)/test_svn_log_parser.o
 
-all:    svn-logfile-analyser
+all:    svn-log-analyser	\
+	test
 
-svn-logfile-analyser :	$(objects) $(BUILD)/main.o
+svn-log-analyser :	$(objects) $(BUILD)/main.o
 	c++ $^ -o $@ $(LIBS)
 
-test: svn-logfile-analyser-test
+test: svn-log-analyser-test
 	./$^
 
-svn-logfile-analyser-test: $(objects) $(test_objects) $(BUILD)/test_main.o
+svn-log-analyser-test: $(objects) $(test_objects) $(BUILD)/test_main.o
 	c++ $^ -o $@ $(LIBS) $(TEST_LIBS)
 
 $(BUILD)/%.o : $(TEST_SRC)/%.cpp
-	c++ -I src/cpp -c $< -I/src/cpp -o $@
+	c++ -c $< -I src -o $@
 
 $(BUILD)/%.o : $(SRC)/%.cpp $(SRC)/%.hpp
 	c++ -I src/cpp:/usr/local/include -c $< -I/src/cpp -o $@
 
 clean:
 	-rm -f $(BUILD)/*
-	-rm code
-	-rm code-test
+	-rm svn-log-analyser
+	-rm svn-log-analyser-test
 build:
 	mkdir build

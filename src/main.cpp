@@ -1,19 +1,9 @@
 #include <iostream>
-#include <iostream>
 #include <string>
 #include <boost/regex.hpp>
 #include <map>
 
-
-typedef std::pair<std::string, int> mypair;
-
-namespace sort {
-  struct descending {
-    bool operator()(const mypair &lhs, const mypair &rhs) {
-      return lhs.second > rhs.second;
-    }
-  };
-};
+#include "utils.hpp"
 
 int main (int argc, const char * argv[])
 {
@@ -66,8 +56,8 @@ int main (int argc, const char * argv[])
   }
   std::cerr << std::endl;
 
-  std::vector<mypair> myvec(change_counts.begin(), change_counts.end());  
-  std::sort(myvec.begin(), myvec.end(), sort::descending());
+  std::vector<std::pair<std::string, int> > myvec(change_counts.begin(), change_counts.end());  
+  std::sort(myvec.begin(), myvec.end(), sort::descending<std::pair<std::string, int> >());
 
   std::cout << "Top 50 most frequently changed files" << std::endl;
   std::cout << "# Changes\tFile" << std::endl;
