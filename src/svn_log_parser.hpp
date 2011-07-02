@@ -14,7 +14,6 @@ public:
 	virtual void on_break() = 0;
 	virtual void on_change(const std::string& change_type, const std::string& filename) = 0;
 	virtual void on_summary(const change_summary& summary) = 0;
-
 };
 
 class parser {

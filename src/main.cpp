@@ -4,71 +4,58 @@
 #include <map>
 
 #include "utils.hpp"
+#include "svn_log_parser.hpp"
 
-int main (int argc, const char * argv[])
-{
-  std::map<std::string, int> change_counts;
+class count_changes: public subversion::log::parser_actions {
+public:
+	std::map<std::string, int> change_counts;
+	void on_break() {
+	}
+	void on_change(const std::string& change_type, const std::string& filename) {
+		if (change_counts.find(filename) == change_counts.end()) {
+			change_counts[filename] = 1;
+		} else {
+			change_counts[filename] += 1;
+		}
+	}
+	void on_summary(const subversion::log::change_summary& summary) {
+	}
+};
 
+class report_writer {
+	std::ostream& out;
+public:
 
-  boost::regex break_regex("^[-]+$", boost::match_default);
-  boost::regex change_regex("   ([AMD]) ([^$]+)", boost::match_default);
-  boost::regex summary_regex("^r(\\d+)"					\
-			     "\\s\\|\\s"				\
-			     "([^|]+)"					\
-			     "\\s\\|\\s"				\
-			     "(\\d+)-(\\d+)-(\\d+)\\s(\\d+):(\\d+):(\\d+)\\s[-+](\\d+)" \
-			     "\\s\\((\\w+),\\s(\\d+)\\s(\\w+)\\s(\\d+)\\)"					\
-			     "\\s\\|\\s"				\
-			     "(\\d+)\\sline"				\
-			     ".*", boost::match_default | boost::regex_constants::icase);
+	report_writer(std::ostream& out) :
+		out(out) {
+	}
 
+	void write(std::map<std::string, int>& change_counts) {
+		std::vector<std::pair<std::string, int> > myvec(change_counts.begin(), change_counts.end());
+		std::sort(myvec.begin(), myvec.end(), sort::descending<std::pair<std::string, int> >());
+		const int & count = std::min(50, (int) ((myvec.size())));
+		out << "Top " << count << " most frequently changed files" << std::endl;
+		out << "# Changes\tFile" << std::endl;
+		for (int i = 0; i < count; ++i) {
+			if (myvec[i].second <= 1)
+				break;
 
-  std::string line;
-  
-  while (getline(std::cin, line)) {
-    boost::match_results<std::string::const_iterator> what;
+			out << myvec[i].second << "\t" << myvec[i].first << std::endl;
+		}
+	}
+};
 
-    if (regex_match(line, what, summary_regex)) {
+int main(int argc, const char * argv[]) {
 
-      std::string revision(what[1].first, what[1].second);
-      //      cout << "Revision " << revision << std::endl;
-      //      cout << "Author " << std::string(what[2].first, what[2].second) << std::endl;
+	count_changes actions;
 
-    } else if (boost::regex_match(line, break_regex)) {
-      std::cerr << ".";
+	subversion::log::parser parser(actions);
 
-      //      cout << "-- BREAK LINE " << std::endl;
+	parser.parse(std::cin);
 
-    } else if(regex_match(line, what, change_regex)) {
-      std::string change_type(what[1].first, what[1].second);
-      std::string file_path(what[2].first, what[2].second);
+	report_writer writer(std::cout);
 
-      if (change_counts.find(file_path) == change_counts.end()) {
-	change_counts[file_path] = 1;
-      } else {
-	change_counts[file_path] += 1;
-      }
+	writer.write(actions.change_counts);
 
-      //      cout << "File " << file_path << " " << change_type << std::endl;
-    } else {
-      //      cout << line << std::endl;
-    }
-  }
-  std::cerr << std::endl;
-
-  std::vector<std::pair<std::string, int> > myvec(change_counts.begin(), change_counts.end());  
-  std::sort(myvec.begin(), myvec.end(), sort::descending<std::pair<std::string, int> >());
-
-  std::cout << "Top 50 most frequently changed files" << std::endl;
-  std::cout << "# Changes\tFile" << std::endl;
-  
-  for (int i = 0; i < std::min(50, (int)myvec.size()); ++i) {
-    if (myvec[i].second <= 1)
-      break;
-    std::cout << myvec[i].second << "\t" << myvec[i].first << std::endl;
-  }
-
-
-  return 0;
+	return 0;
 }
-
