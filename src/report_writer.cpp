@@ -21,8 +21,7 @@ void report_writer::write(std::map<std::string, int>& change_counts) {
 }
 
 void report_writer::write_header(int count) {
-  out << "Top " << count << " most frequently changed files" << std::endl;
-  out << "# Changes\tFile" << std::endl;
+  out << "Commit Count,File" << std::endl;
 }
 
 void report_writer::write_results(pair_vector& v, int count) {
@@ -30,7 +29,6 @@ void report_writer::write_results(pair_vector& v, int count) {
     if (v[i].second <= 1)
       break;
 
-    out << v[i].second << "\t" << v[i].first << std::endl;
+    out << v[i].second << "," << v[i].first << std::endl;
   }
-
 }

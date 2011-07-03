@@ -17,7 +17,7 @@ int main(int argc, const char * argv[]) {
 
   count_changes actions;
 
-  subversion::log::parser parser(actions);
+  subversion::log::parser parser(actions, options);
 
   parser.parse(std::cin);
 

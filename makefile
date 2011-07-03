@@ -11,10 +11,12 @@ TEST_LIBS	= 	/usr/local/lib/libboost_unit_test_framework.a
 
 objects 	= 	$(BUILD)/svn_log_parser.o \
 			$(BUILD)/report_writer.o \
-			$(BUILD)/options_parser.o
+			$(BUILD)/options_parser.o \
+			$(BUILD)/file_filter.o
 
 test_objects	=	$(BUILD)/test_utils.o \
-			$(BUILD)/test_svn_log_parser.o
+			$(BUILD)/test_svn_log_parser.o \
+			$(BUILD)/test_file_filter.o
 
 all:    svn-log-analyser	\
 	test
@@ -29,10 +31,10 @@ svn-log-analyser-test: $(objects) $(test_objects) $(BUILD)/test_main.o
 	c++ $^ -o $@ $(LIBS) $(TEST_LIBS)
 
 $(BUILD)/%.o : $(TEST_SRC)/%.cpp
-	c++ -c $< -I src -o $@
+	c++ -I src -c $< -o $@
 
 $(BUILD)/%.o : $(SRC)/%.cpp $(SRC)/%.hpp
-	c++ -I src/cpp:/usr/local/include -c $< -I/src/cpp -o $@
+	c++ -I src -I /usr/local/include -c $< -o $@
 
 clean:
 	-rm -f $(BUILD)/*

@@ -9,7 +9,7 @@ options_parser::options_parser(std::ostream& output) : output(output) {
 }
 
 void options_parser::parse(int argc, const char * argv[], command_options& options) {
-
+  
   boost::program_options::options_description opts("Options");
  
   add_visible_options(opts);
@@ -37,6 +37,14 @@ void options_parser::parse(int argc, const char * argv[], command_options& optio
 
     options.format = formats[0];
   }
+
+  if (vm.count("filter")) {
+    const string_vector& filters = vm["filter"].as<std::vector<std::string> >();
+
+    options.filter = file_filter(filters[0]);
+  } else {
+    options.filter = file_filter(".*");
+  }
   
   if (vm.count("input-file")) {
     const std::vector<std::string>& files = vm["input-file"].as<std::vector<std::string> >();
@@ -51,6 +59,7 @@ void options_parser::add_visible_options(boost::program_options::options_descrip
   opts.add_options()
     ("help,h", "Produce help message") 
     ("format,f", boost::program_options::value< std::vector<std::string> >(), "Specify the output format (csv)") 
+    ("filter,l", boost::program_options::value< std::vector<std::string> >(), "Filter the files contained in the the report") 
     ;
 }
 
