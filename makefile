@@ -10,7 +10,8 @@ LIBS		= 	/usr/local/lib/libboost_filesystem.a \
 TEST_LIBS	= 	/usr/local/lib/libboost_unit_test_framework.a 
 
 objects 	= 	$(BUILD)/svn_log_parser.o \
-			$(BUILD)/report_writer.o
+			$(BUILD)/report_writer.o \
+			$(BUILD)/options_parser.o
 
 test_objects	=	$(BUILD)/test_utils.o \
 			$(BUILD)/test_svn_log_parser.o
